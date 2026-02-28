@@ -14,7 +14,6 @@ RUN uv sync --frozen --no-dev --no-install-project
 # Copy application code
 COPY main.py ./
 COPY app/ ./app/
-COPY static/ ./static/
 
 EXPOSE 8000
 
