@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+
+{% block title %}Report: {{ report.company_name }}{% endblock %}
+
+{% block head %}
+<style>
+    .report-header {
+        padding: 48px 0 32px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 40px;
+    }
+    .report-meta {
+        display: flex;
+        gap: 24px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+    }
+    .meta-tag {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 4px 12px;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+    }
+    .report-header h1 {
+        font-size: 2rem;
+        margin-bottom: 8px;
+    }
+    .report-header .question {
+        color: var(--text-muted);
+        font-size: 1.05rem;
+    }
+
+    .report-body {
+        display: grid;
+        grid-template-columns: 1fr 300px;
+        gap: 40px;
+        padding-bottom: 60px;
+    }
+
+    .report-content h2 {
+        font-size: 1.4rem;
+        margin-top: 36px;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--border);
+        color: var(--accent);
+    }
+    .report-content h3 {
+        font-size: 1.1rem;
+        margin-top: 20px;
+        margin-bottom: 8px;
+    }
+    .report-content p {
+        margin-bottom: 12px;
+        color: var(--text);
+        line-height: 1.7;
+    }
+    .report-content ul, .report-content ol {
+        margin: 12px 0;
+        padding-left: 24px;
+    }
+    .report-content li {
+        margin-bottom: 6px;
+        line-height: 1.6;
+    }
+    .report-content strong { color: var(--accent); }
+    .report-content table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 16px 0;
+    }
+    .report-content th, .report-content td {
+        padding: 10px 14px;
+        border: 1px solid var(--border);
+        text-align: left;
+        font-size: 0.9rem;
+    }
+    .report-content th {
+        background: var(--bg-card);
+        font-weight: 600;
+    }
+
+    .sidebar {
+        position: sticky;
+        top: 24px;
+        align-self: start;
+    }
+    .sidebar-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 20px;
+    }
+    .sidebar-card h3 {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        margin-bottom: 16px;
+    }
+    .insight-item {
+        padding: 8px 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+    .insight-item:last-child { border-bottom: none; }
+
+    .actions { display: flex; flex-direction: column; gap: 8px; }
+    .actions .btn { text-align: center; font-size: 0.9rem; }
+    .btn-outline {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text);
+    }
+    .btn-outline:hover { border-color: var(--text-muted); }
+
+    .gen-info {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: 12px;
+    }
+
+    @media (max-width: 900px) {
+        .report-body { grid-template-columns: 1fr; }
+        .sidebar { position: static; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="report-header">
+        <div class="report-meta">
+            <span class="meta-tag">{{ report.analysis_type | replace('_', ' ') | title }}</span>
+            <span class="meta-tag">{{ report.industry }}</span>
+            <span class="meta-tag">{{ report.created_at[:10] }}</span>
+            <span class="meta-tag">ID: {{ report.id }}</span>
+        </div>
+        <h1>{{ report.company_name }} &mdash; Market Research Report</h1>
+        <p class="question">{{ report.question }}</p>
+    </div>
+
+    <div class="report-body">
+        <div class="report-content" id="report-md">
+            <!-- Report will be rendered here by JS -->
+        </div>
+
+        <div class="sidebar">
+            <div class="sidebar-card">
+                <h3>Key Insights</h3>
+                {% for insight in report.key_insights %}
+                <div class="insight-item">{{ insight }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="sidebar-card">
+                <h3>Recommendations</h3>
+                {% for rec in report.recommendations %}
+                <div class="insight-item">{{ rec }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="sidebar-card">
+                <h3>Actions</h3>
+                <div class="actions">
+                    <button class="btn btn-primary" onclick="window.print()">Export / Print PDF</button>
+                    <button class="btn btn-outline" onclick="copyReport()">Copy as Markdown</button>
+                    <a href="/" class="btn btn-outline">New Report</a>
+                </div>
+                <div class="gen-info">
+                    Generated in {{ report.generation_time_seconds }}s
+                    &middot; {{ report.estimated_tokens_used }} tokens
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Simple markdown to HTML renderer (no external deps)
+function renderMarkdown(md) {
+    let html = md
+        // Headers
+        .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+        .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+        .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+        // Bold & italic
+        .replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        // Unordered lists
+        .replace(/^\s*[-*] (.*$)/gm, '<li>$1</li>')
+        // Ordered lists
+        .replace(/^\s*\d+\. (.*$)/gm, '<li>$1</li>')
+        // Paragraphs
+        .replace(/\n\n/g, '</p><p>')
+        // Line breaks within paragraphs
+        .replace(/\n/g, '<br>');
+
+    // Wrap consecutive <li> in <ul>
+    html = html.replace(/(<li>.*?<\/li>)(?=\s*<li>)/gs, '$1');
+    html = html.replace(/(<li>[\s\S]*?<\/li>)/g, '<ul>$1</ul>');
+    // Remove nested ul tags
+    html = html.replace(/<\/ul>\s*<ul>/g, '');
+
+    return `<p>${html}</p>`;
+}
+
+const reportMd = {{ report.full_report | tojson }};
+document.getElementById('report-md').innerHTML = renderMarkdown(reportMd);
+
+function copyReport() {
+    navigator.clipboard.writeText(reportMd).then(() => {
+        alert('Report copied to clipboard as Markdown!');
+    });
+}
+</script>
+{% endblock %}

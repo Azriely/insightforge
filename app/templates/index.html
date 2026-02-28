@@ -1,0 +1,393 @@
+{% extends "base.html" %}
+
+{% block title %}AI Market Research in Minutes{% endblock %}
+
+{% block head %}
+<style>
+    .hero {
+        text-align: center;
+        padding: 80px 0 60px;
+    }
+    .hero h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        line-height: 1.15;
+        margin-bottom: 20px;
+    }
+    .hero h1 .highlight { color: var(--accent); }
+    .hero p {
+        font-size: 1.2rem;
+        color: var(--text-muted);
+        max-width: 600px;
+        margin: 0 auto 40px;
+    }
+
+    .stats-bar {
+        display: flex;
+        justify-content: center;
+        gap: 48px;
+        margin-bottom: 60px;
+    }
+    .stat { text-align: center; }
+    .stat-number { font-size: 2rem; font-weight: 700; color: var(--accent); }
+    .stat-label { font-size: 0.85rem; color: var(--text-muted); }
+
+    .form-section {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 48px;
+        max-width: 700px;
+        margin: 0 auto 80px;
+    }
+    .form-section h2 {
+        font-size: 1.5rem;
+        margin-bottom: 8px;
+    }
+    .form-section .subtitle {
+        color: var(--text-muted);
+        margin-bottom: 32px;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    .form-group label {
+        display: block;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 12px 16px;
+        background: var(--bg-input);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        color: var(--text);
+        font-size: 1rem;
+        font-family: inherit;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+    .submit-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 28px;
+    }
+    .price-tag {
+        color: var(--success);
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+    .price-tag .free { color: var(--accent); }
+
+    #loading {
+        display: none;
+        text-align: center;
+        padding: 40px;
+    }
+    #loading .spinner {
+        width: 48px;
+        height: 48px;
+        border: 4px solid var(--border);
+        border-top-color: var(--primary);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #error-msg {
+        display: none;
+        background: #7f1d1d;
+        border: 1px solid #991b1b;
+        padding: 12px 16px;
+        border-radius: 8px;
+        margin-top: 16px;
+        font-size: 0.9rem;
+    }
+
+    .features {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+        margin-bottom: 80px;
+    }
+    .feature-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 28px;
+    }
+    .feature-card h3 {
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+    }
+    .feature-card p {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    .pricing {
+        text-align: center;
+        margin-bottom: 80px;
+    }
+    .pricing h2 {
+        font-size: 2rem;
+        margin-bottom: 40px;
+    }
+    .pricing-cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+    }
+    .pricing-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 32px;
+        text-align: center;
+    }
+    .pricing-card.featured {
+        border-color: var(--primary);
+        position: relative;
+    }
+    .pricing-card.featured::before {
+        content: "MOST POPULAR";
+        position: absolute;
+        top: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--primary);
+        color: white;
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 4px 12px;
+        border-radius: 20px;
+    }
+    .pricing-card h3 {
+        font-size: 1.2rem;
+        margin-bottom: 8px;
+    }
+    .pricing-card .price {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin: 16px 0;
+    }
+    .pricing-card .price span {
+        font-size: 1rem;
+        font-weight: 400;
+        color: var(--text-muted);
+    }
+    .pricing-card ul {
+        list-style: none;
+        margin: 20px 0;
+        text-align: left;
+    }
+    .pricing-card li {
+        padding: 6px 0;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+    }
+    .pricing-card li::before {
+        content: "\2713 ";
+        color: var(--success);
+        font-weight: 700;
+    }
+
+    @media (max-width: 768px) {
+        .hero h1 { font-size: 2rem; }
+        .stats-bar { gap: 24px; }
+        .form-row { grid-template-columns: 1fr; }
+        .features, .pricing-cards { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <section class="hero">
+        <h1>Consulting-Quality<br><span class="highlight">Market Research</span><br>In 60 Seconds</h1>
+        <p>Get detailed competitive analysis, market sizing, and strategic recommendations powered by AI. Reports that would cost $5,000 from McKinsey, delivered instantly.</p>
+    </section>
+
+    <div class="stats-bar">
+        <div class="stat">
+            <div class="stat-number">60s</div>
+            <div class="stat-label">Average delivery time</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number">95%</div>
+            <div class="stat-label">Accuracy rate</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number">$49</div>
+            <div class="stat-label">Per report</div>
+        </div>
+    </div>
+
+    <section class="form-section" id="how-it-works">
+        <h2>Generate Your Report</h2>
+        <p class="subtitle">Fill in the details below and get your analysis in about 60 seconds.</p>
+
+        <form id="analysis-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="company_name">Company / Product Name</label>
+                    <input type="text" id="company_name" name="company_name" placeholder="e.g., Stripe, Notion, your startup" required>
+                </div>
+                <div class="form-group">
+                    <label for="industry">Industry</label>
+                    <input type="text" id="industry" name="industry" placeholder="e.g., FinTech, SaaS, E-commerce" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="analysis_type">Analysis Type</label>
+                <select id="analysis_type" name="analysis_type">
+                    <option value="comprehensive">Comprehensive Market Analysis</option>
+                    <option value="competitive">Competitive Intelligence Report</option>
+                    <option value="swot">SWOT Analysis</option>
+                    <option value="market_sizing">Market Sizing (TAM/SAM/SOM)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="question">Research Question / Focus Area</label>
+                <textarea id="question" name="question" placeholder="e.g., What is the market opportunity for AI-powered accounting software targeting SMBs in North America? Who are the main competitors and what are their weaknesses?" required></textarea>
+            </div>
+
+            <div class="submit-row">
+                <div class="price-tag">
+                    <span class="free">First report FREE</span> &middot; then $49/report
+                </div>
+                <button type="submit" class="btn btn-primary" id="submit-btn">Generate Report</button>
+            </div>
+
+            <div id="error-msg"></div>
+        </form>
+
+        <div id="loading">
+            <div class="spinner"></div>
+            <p>Generating your report...</p>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 8px;">
+                Our AI is analyzing markets, competitors, and trends. This typically takes 30-90 seconds.
+            </p>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="feature-card">
+            <h3>Comprehensive Analysis</h3>
+            <p>Market overview, competitive landscape, SWOT, customer segmentation, and strategic recommendations in a single report.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Instant Delivery</h3>
+            <p>No waiting days for a consultant. Get your report in 30-90 seconds, ready to present to your team or investors.</p>
+        </div>
+        <div class="feature-card">
+            <h3>API Access</h3>
+            <p>Integrate market research directly into your workflows with our REST API. Perfect for product teams and analysts.</p>
+        </div>
+    </section>
+
+    <section class="pricing" id="pricing">
+        <h2>Simple Pricing</h2>
+        <div class="pricing-cards">
+            <div class="pricing-card">
+                <h3>Starter</h3>
+                <div class="price">$49<span>/report</span></div>
+                <ul>
+                    <li>Any analysis type</li>
+                    <li>Full detailed report</li>
+                    <li>PDF export</li>
+                    <li>Email delivery</li>
+                </ul>
+                <a href="#how-it-works" class="btn btn-primary" style="width: 100%;">Get Started</a>
+            </div>
+            <div class="pricing-card featured">
+                <h3>Professional</h3>
+                <div class="price">$199<span>/month</span></div>
+                <ul>
+                    <li>10 reports / month</li>
+                    <li>All analysis types</li>
+                    <li>API access</li>
+                    <li>Priority generation</li>
+                    <li>Report history</li>
+                </ul>
+                <a href="#how-it-works" class="btn btn-primary" style="width: 100%;">Subscribe</a>
+            </div>
+            <div class="pricing-card">
+                <h3>Enterprise</h3>
+                <div class="price">$499<span>/month</span></div>
+                <ul>
+                    <li>Unlimited reports</li>
+                    <li>Custom analysis templates</li>
+                    <li>API access (high rate limit)</li>
+                    <li>Dedicated support</li>
+                    <li>White-label option</li>
+                </ul>
+                <a href="#how-it-works" class="btn btn-primary" style="width: 100%;">Contact Us</a>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const form = document.getElementById('analysis-form');
+const loading = document.getElementById('loading');
+const errorMsg = document.getElementById('error-msg');
+const submitBtn = document.getElementById('submit-btn');
+
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const data = {
+        company_name: document.getElementById('company_name').value,
+        industry: document.getElementById('industry').value,
+        analysis_type: document.getElementById('analysis_type').value,
+        question: document.getElementById('question').value,
+    };
+
+    form.style.display = 'none';
+    loading.style.display = 'block';
+    errorMsg.style.display = 'none';
+
+    try {
+        const resp = await fetch('/api/v1/analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        });
+
+        if (!resp.ok) {
+            const err = await resp.json();
+            throw new Error(err.detail || 'Analysis failed');
+        }
+
+        const report = await resp.json();
+        window.location.href = `/report/${report.id}`;
+    } catch (err) {
+        form.style.display = 'block';
+        loading.style.display = 'none';
+        errorMsg.textContent = `Error: ${err.message}`;
+        errorMsg.style.display = 'block';
+    }
+});
+</script>
+{% endblock %}
