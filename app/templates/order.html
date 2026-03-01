@@ -1,0 +1,313 @@
+{% extends "base.html" %}
+
+{% block title %}Order Your Report{% endblock %}
+
+{% block head %}
+<style>
+    .order-page {
+        max-width: 680px;
+        margin: 0 auto;
+        padding: 48px 0 80px;
+    }
+    .order-page h1 {
+        font-size: 2rem;
+        margin-bottom: 8px;
+    }
+    .order-page .subtitle {
+        color: var(--text-muted);
+        margin-bottom: 36px;
+        font-size: 1.05rem;
+    }
+    .order-form {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 40px;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    .form-group label {
+        display: block;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+    .form-group .hint {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: 4px;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 12px 16px;
+        background: var(--bg-input);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        color: var(--text);
+        font-size: 1rem;
+        font-family: inherit;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+    .form-group textarea { resize: vertical; min-height: 120px; }
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+    .steps {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 32px;
+    }
+    .step {
+        flex: 1;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 16px;
+        text-align: center;
+    }
+    .step-num {
+        display: inline-block;
+        width: 28px;
+        height: 28px;
+        background: var(--primary);
+        color: white;
+        border-radius: 50%;
+        line-height: 28px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        margin-bottom: 6px;
+    }
+    .step p {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+    }
+    #submit-btn { width: 100%; margin-top: 8px; font-size: 1.05rem; padding: 14px; }
+    #result {
+        display: none;
+        background: var(--bg-card);
+        border: 1px solid var(--success);
+        border-radius: 16px;
+        padding: 40px;
+        text-align: center;
+    }
+    #result h2 { color: var(--success); margin-bottom: 12px; }
+    #result .status-link {
+        display: block;
+        background: var(--bg-input);
+        padding: 14px;
+        border-radius: 8px;
+        margin: 20px 0;
+        word-break: break-all;
+        font-family: monospace;
+        font-size: 0.9rem;
+    }
+    #result .status-link a { color: var(--accent); text-decoration: none; }
+    #error-msg {
+        display: none;
+        background: #7f1d1d;
+        border: 1px solid #991b1b;
+        padding: 12px 16px;
+        border-radius: 8px;
+        margin-top: 12px;
+    }
+    .spinner {
+        width: 40px; height: 40px;
+        border: 4px solid var(--border);
+        border-top-color: var(--primary);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        margin: 0 auto 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loading { display: none; text-align: center; padding: 40px; }
+
+    @media (max-width: 600px) {
+        .form-row { grid-template-columns: 1fr; }
+        .steps { flex-direction: column; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="order-page">
+        <h1>Order Your Market Research Report</h1>
+        <p class="subtitle">Fill in the details below. Your report will be generated automatically and ready in about 90 seconds.</p>
+
+        <div class="steps">
+            <div class="step">
+                <div class="step-num">1</div>
+                <p>Fill in details</p>
+            </div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <p>AI generates report</p>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <p>Get your link</p>
+            </div>
+        </div>
+
+        <div class="order-form" id="order-form">
+            <form id="intake-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="client_name">Your Name</label>
+                        <input type="text" id="client_name" placeholder="Jane Smith" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="client_email">Your Email</label>
+                        <input type="email" id="client_email" placeholder="jane@company.com" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="company_name">Company / Product to Analyze</label>
+                        <input type="text" id="company_name" placeholder="e.g., Stripe, Notion" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="industry">Industry</label>
+                        <input type="text" id="industry" placeholder="e.g., FinTech, SaaS" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="analysis_type">Report Type</label>
+                    <select id="analysis_type">
+                        <option value="comprehensive">Comprehensive Market Analysis</option>
+                        <option value="competitive">Competitive Intelligence Report</option>
+                        <option value="swot">SWOT Analysis</option>
+                        <option value="market_sizing">Market Sizing (TAM/SAM/SOM)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="question">Research Question / Focus Area</label>
+                    <textarea id="question" placeholder="Be specific! Example: What is the market opportunity for AI-powered accounting software targeting SMBs in North America? Who are the main competitors and what are their weaknesses?" required></textarea>
+                    <div class="hint">The more specific your question, the better the report. Include geography, target customer, or specific competitors if relevant.</div>
+                </div>
+
+                <input type="hidden" id="source" value="direct">
+
+                <button type="submit" class="btn btn-primary" id="submit-btn">Generate My Report</button>
+                <div id="error-msg"></div>
+            </form>
+        </div>
+
+        <div id="loading">
+            <div class="spinner"></div>
+            <p style="font-size: 1.1rem; font-weight: 600;">Generating your report...</p>
+            <p style="color: var(--text-muted); margin-top: 8px;">This typically takes 60-90 seconds. Please don't close this page.</p>
+        </div>
+
+        <div id="result">
+            <h2>Your Report is Ready!</h2>
+            <p>Your market research report has been generated. Bookmark or save the link below:</p>
+            <div class="status-link" id="report-link"></div>
+            <a id="view-report-btn" href="#" class="btn btn-primary" style="margin-top: 12px;">View Your Report</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Capture source from URL params (e.g., /order?source=fiverr)
+const urlParams = new URLSearchParams(window.location.search);
+const source = urlParams.get('source') || 'direct';
+document.getElementById('source').value = source;
+
+const form = document.getElementById('intake-form');
+const orderForm = document.getElementById('order-form');
+const loading = document.getElementById('loading');
+const result = document.getElementById('result');
+const errorMsg = document.getElementById('error-msg');
+
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+
+    const data = {
+        client_name: document.getElementById('client_name').value,
+        client_email: document.getElementById('client_email').value,
+        company_name: document.getElementById('company_name').value,
+        industry: document.getElementById('industry').value,
+        analysis_type: document.getElementById('analysis_type').value,
+        question: document.getElementById('question').value,
+        source: document.getElementById('source').value,
+    };
+
+    orderForm.style.display = 'none';
+    loading.style.display = 'block';
+    errorMsg.style.display = 'none';
+
+    try {
+        // Create the order
+        const resp = await fetch('/api/v1/orders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        });
+
+        if (!resp.ok) throw new Error((await resp.json()).detail || 'Order failed');
+
+        const order = await resp.json();
+
+        // Poll for completion
+        const statusUrl = `/api/v1/orders/${order.order_id}?key=${new URL(order.status_url).searchParams.get('key')}`;
+        let attempts = 0;
+        const maxAttempts = 60; // 5 minutes max
+
+        const poll = setInterval(async () => {
+            attempts++;
+            try {
+                const statusResp = await fetch(statusUrl);
+                const status = await statusResp.json();
+
+                if (status.status === 'completed' && status.report_url) {
+                    clearInterval(poll);
+                    loading.style.display = 'none';
+                    result.style.display = 'block';
+                    document.getElementById('report-link').innerHTML =
+                        `<a href="${status.report_url}" target="_blank">${status.report_url}</a>`;
+                    document.getElementById('view-report-btn').href = status.report_url;
+                } else if (status.status === 'failed') {
+                    clearInterval(poll);
+                    throw new Error('Report generation failed. Please try again.');
+                } else if (attempts >= maxAttempts) {
+                    clearInterval(poll);
+                    throw new Error('Report is taking longer than expected. Please check back using your status URL.');
+                }
+            } catch (err) {
+                clearInterval(poll);
+                loading.style.display = 'none';
+                orderForm.style.display = 'block';
+                errorMsg.textContent = err.message;
+                errorMsg.style.display = 'block';
+                btn.disabled = false;
+            }
+        }, 5000); // Check every 5 seconds
+
+    } catch (err) {
+        orderForm.style.display = 'block';
+        loading.style.display = 'none';
+        errorMsg.textContent = `Error: ${err.message}`;
+        errorMsg.style.display = 'block';
+        btn.disabled = false;
+    }
+});
+</script>
+{% endblock %}

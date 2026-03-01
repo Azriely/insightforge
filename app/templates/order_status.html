@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}Order {{ order.id }}{% endblock %}
+
+{% block head %}
+<style>
+    .status-page {
+        max-width: 680px;
+        margin: 0 auto;
+        padding: 48px 0 80px;
+        text-align: center;
+    }
+    .status-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 40px;
+        margin-top: 24px;
+    }
+    .status-badge {
+        display: inline-block;
+        padding: 6px 18px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 20px;
+    }
+    .status-queued { background: #78350f; color: #fbbf24; }
+    .status-generating { background: #1e3a5f; color: #60a5fa; }
+    .status-completed { background: #064e3b; color: #6ee7b7; }
+    .status-failed { background: #7f1d1d; color: #fca5a5; }
+    .order-details {
+        text-align: left;
+        margin: 24px 0;
+    }
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 0.9rem;
+    }
+    .detail-label { color: var(--text-muted); }
+    .report-link {
+        display: block;
+        background: var(--bg-input);
+        padding: 16px;
+        border-radius: 8px;
+        margin: 20px 0;
+        font-size: 1rem;
+    }
+    .report-link a { color: var(--accent); text-decoration: none; font-weight: 600; }
+    .spinner {
+        width: 48px; height: 48px;
+        border: 4px solid var(--border);
+        border-top-color: var(--primary);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="status-page">
+        <h1>Order Status</h1>
+
+        <div class="status-card">
+            {% if order.status == "completed" and report %}
+                <div class="status-badge status-completed">Completed</div>
+                <h2 style="margin-bottom: 8px;">Your Report is Ready!</h2>
+                <p style="color: var(--text-muted);">{{ report.company_name }} &mdash; {{ report.analysis_type | replace('_', ' ') | title }}</p>
+
+                <div class="report-link">
+                    <a href="/report/{{ report.id }}">View Full Report &rarr;</a>
+                </div>
+
+                <a href="/report/{{ report.id }}" class="btn btn-primary" style="width: 100%;">Open Report</a>
+
+            {% elif order.status == "generating" %}
+                <div class="status-badge status-generating">Generating</div>
+                <div class="spinner"></div>
+                <h2>Your report is being generated...</h2>
+                <p style="color: var(--text-muted); margin-top: 8px;">This typically takes 60-90 seconds. This page auto-refreshes.</p>
+
+            {% elif order.status == "queued" %}
+                <div class="status-badge status-queued">Queued</div>
+                <div class="spinner"></div>
+                <h2>Your order is in the queue</h2>
+                <p style="color: var(--text-muted); margin-top: 8px;">Generation will start shortly. This page auto-refreshes.</p>
+
+            {% elif order.status == "failed" %}
+                <div class="status-badge status-failed">Failed</div>
+                <h2>Something went wrong</h2>
+                <p style="color: var(--text-muted); margin-top: 8px;">Please contact us at insightforge@azriel.io and we'll regenerate your report.</p>
+            {% endif %}
+
+            <div class="order-details">
+                <div class="detail-row">
+                    <span class="detail-label">Order ID</span>
+                    <span>{{ order.id }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Company</span>
+                    <span>{{ order.company_name }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Report Type</span>
+                    <span>{{ order.analysis_type | replace('_', ' ') | title }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Ordered</span>
+                    <span>{{ order.created_at[:19] }}</span>
+                </div>
+                {% if order.completed_at %}
+                <div class="detail-row">
+                    <span class="detail-label">Completed</span>
+                    <span>{{ order.completed_at[:19] }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if order.status in ["queued", "generating"] %}
+<script>
+// Auto-refresh every 5 seconds while order is pending
+setTimeout(() => { window.location.reload(); }, 5000);
+</script>
+{% endif %}
+{% endblock %}
