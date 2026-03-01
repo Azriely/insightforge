@@ -240,51 +240,26 @@
     </div>
 
     <section class="form-section" id="how-it-works">
-        <h2>Generate Your Report</h2>
-        <p class="subtitle">Fill in the details below and get your analysis in about 60 seconds.</p>
+        <div style="text-align: center; margin-bottom: 24px;">
+            <span style="background: var(--primary); color: white; font-size: 0.75rem; font-weight: 700; padding: 4px 14px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.05em;">Launching Soon</span>
+        </div>
+        <h2 style="text-align: center;">Get Early Access</h2>
+        <p class="subtitle" style="text-align: center;">Self-service reports launching soon. Join the waitlist and be first in line.</p>
 
-        <form id="analysis-form">
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="company_name">Company / Product Name</label>
-                    <input type="text" id="company_name" name="company_name" placeholder="e.g., Stripe, Notion, your startup" required>
-                </div>
-                <div class="form-group">
-                    <label for="industry">Industry</label>
-                    <input type="text" id="industry" name="industry" placeholder="e.g., FinTech, SaaS, E-commerce" required>
-                </div>
-            </div>
-
+        <form id="waitlist-form" style="max-width: 440px; margin: 0 auto;">
             <div class="form-group">
-                <label for="analysis_type">Analysis Type</label>
-                <select id="analysis_type" name="analysis_type">
-                    <option value="comprehensive">Comprehensive Market Analysis</option>
-                    <option value="competitive">Competitive Intelligence Report</option>
-                    <option value="swot">SWOT Analysis</option>
-                    <option value="market_sizing">Market Sizing (TAM/SAM/SOM)</option>
-                </select>
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="you@company.com" required>
             </div>
-
-            <div class="form-group">
-                <label for="question">Research Question / Focus Area</label>
-                <textarea id="question" name="question" placeholder="e.g., What is the market opportunity for AI-powered accounting software targeting SMBs in North America? Who are the main competitors and what are their weaknesses?" required></textarea>
-            </div>
-
-            <div class="submit-row">
-                <div class="price-tag">
-                    <span class="free">First report FREE</span> &middot; then $49/report
-                </div>
-                <button type="submit" class="btn btn-primary" id="submit-btn">Generate Report</button>
-            </div>
-
-            <div id="error-msg"></div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;" id="waitlist-btn">Join the Waitlist</button>
+            <div id="waitlist-msg" style="display: none; text-align: center; margin-top: 16px; padding: 12px; border-radius: 8px;"></div>
         </form>
 
-        <div id="loading">
-            <div class="spinner"></div>
-            <p>Generating your report...</p>
-            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 8px;">
-                Our AI is analyzing markets, competitors, and trends. This typically takes 30-90 seconds.
+        <div style="text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border);">
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Need a report <strong style="color: var(--accent);">right now</strong>?</p>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">
+                We deliver custom market research reports within 24 hours.
+                <br><a href="mailto:insightforge@azriel.io" style="color: var(--accent);">insightforge@azriel.io</a> &middot; Starting at $75/report
             </p>
         </div>
     </section>
@@ -349,44 +324,34 @@
 
 {% block scripts %}
 <script>
-const form = document.getElementById('analysis-form');
-const loading = document.getElementById('loading');
-const errorMsg = document.getElementById('error-msg');
-const submitBtn = document.getElementById('submit-btn');
+const form = document.getElementById('waitlist-form');
+const msg = document.getElementById('waitlist-msg');
 
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
-
-    const data = {
-        company_name: document.getElementById('company_name').value,
-        industry: document.getElementById('industry').value,
-        analysis_type: document.getElementById('analysis_type').value,
-        question: document.getElementById('question').value,
-    };
-
-    form.style.display = 'none';
-    loading.style.display = 'block';
-    errorMsg.style.display = 'none';
+    const btn = document.getElementById('waitlist-btn');
+    btn.disabled = true;
+    btn.textContent = 'Joining...';
 
     try {
-        const resp = await fetch('/api/v1/analyze', {
+        const resp = await fetch('/api/v1/waitlist', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
+            body: JSON.stringify({ email: document.getElementById('email').value }),
         });
-
-        if (!resp.ok) {
-            const err = await resp.json();
-            throw new Error(err.detail || 'Analysis failed');
-        }
-
-        const report = await resp.json();
-        window.location.href = `/report/${report.id}`;
+        const data = await resp.json();
+        msg.style.display = 'block';
+        msg.style.background = '#064e3b';
+        msg.style.color = '#6ee7b7';
+        msg.textContent = data.message;
+        btn.textContent = 'You\'re on the list!';
     } catch (err) {
-        form.style.display = 'block';
-        loading.style.display = 'none';
-        errorMsg.textContent = `Error: ${err.message}`;
-        errorMsg.style.display = 'block';
+        msg.style.display = 'block';
+        msg.style.background = '#7f1d1d';
+        msg.style.color = '#fca5a5';
+        msg.textContent = 'Something went wrong. Please try again.';
+        btn.disabled = false;
+        btn.textContent = 'Join the Waitlist';
     }
 });
 </script>
