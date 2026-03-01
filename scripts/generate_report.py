@@ -11,7 +11,7 @@ import json
 import os
 import sys
 
-import requests
+import httpx
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -24,7 +24,7 @@ def generate(company: str, industry: str, analysis_type: str, question: str):
     print(f"Generating {analysis_type} report for {company}...")
     print(f"API: {API_URL}")
 
-    resp = requests.post(
+    resp = httpx.post(
         f"{API_URL}/api/v1/analyze",
         json={
             "company_name": company,
