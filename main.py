@@ -10,13 +10,14 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
 from app.api.routes import router
+from app.core.database import init_db
 
 load_dotenv(override=True)
 
 app = FastAPI(
     title="InsightForge",
     description="AI-powered market research and business analysis",
-    version="0.1.0",
+    version="0.4.0",
 )
 
 # Mount static files if directory exists
@@ -24,6 +25,11 @@ if os.path.isdir("static"):
     app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.include_router(router)
+
+
+@app.on_event("startup")
+def startup():
+    init_db()
 
 if __name__ == "__main__":
     import uvicorn

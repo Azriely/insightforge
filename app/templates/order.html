@@ -91,7 +91,33 @@
         font-size: 0.8rem;
         color: var(--text-muted);
     }
-    #submit-btn { width: 100%; margin-top: 8px; font-size: 1.05rem; padding: 14px; }
+
+    .price-summary {
+        background: var(--bg-input);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 16px 20px;
+        margin-top: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .price-summary .label { color: var(--text-muted); }
+    .price-summary .amount { font-size: 1.5rem; font-weight: 700; color: var(--success); }
+
+    #submit-btn {
+        width: 100%;
+        margin-top: 16px;
+        font-size: 1.05rem;
+        padding: 14px;
+    }
+    .secure-note {
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        margin-top: 10px;
+    }
+
     #result {
         display: none;
         background: var(--bg-card);
@@ -131,6 +157,16 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     #loading { display: none; text-align: center; padding: 40px; }
 
+    .cancelled-banner {
+        background: #78350f;
+        border: 1px solid #92400e;
+        padding: 14px 20px;
+        border-radius: 10px;
+        margin-bottom: 24px;
+        text-align: center;
+        color: #fbbf24;
+    }
+
     @media (max-width: 600px) {
         .form-row { grid-template-columns: 1fr; }
         .steps { flex-direction: column; }
@@ -142,7 +178,11 @@
 <div class="container">
     <div class="order-page">
         <h1>Order Your Market Research Report</h1>
-        <p class="subtitle">Fill in the details below. Your report will be generated automatically and ready in about 90 seconds.</p>
+        <p class="subtitle">Fill in the details below and proceed to secure checkout. Your report will be ready in about 90 seconds after payment.</p>
+
+        <div id="cancelled-msg" class="cancelled-banner" style="display: none;">
+            Payment was cancelled. You can try again below.
+        </div>
 
         <div class="steps">
             <div class="step">
@@ -151,11 +191,11 @@
             </div>
             <div class="step">
                 <div class="step-num">2</div>
-                <p>AI generates report</p>
+                <p>Pay securely</p>
             </div>
             <div class="step">
                 <div class="step-num">3</div>
-                <p>Get your link</p>
+                <p>Get your report</p>
             </div>
         </div>
 
@@ -199,17 +239,22 @@
                     <div class="hint">The more specific your question, the better the report. Include geography, target customer, or specific competitors if relevant.</div>
                 </div>
 
-                <input type="hidden" id="source" value="direct">
+                <input type="hidden" id="source" value="website">
 
-                <button type="submit" class="btn btn-primary" id="submit-btn">Generate My Report</button>
+                <div class="price-summary">
+                    <span class="label">Market Research Report</span>
+                    <span class="amount">$49</span>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="submit-btn">Proceed to Payment &mdash; $49</button>
+                <p class="secure-note">Secure payment via Stripe. Your report is generated immediately after payment.</p>
                 <div id="error-msg"></div>
             </form>
         </div>
 
         <div id="loading">
             <div class="spinner"></div>
-            <p style="font-size: 1.1rem; font-weight: 600;">Generating your report...</p>
-            <p style="color: var(--text-muted); margin-top: 8px;">This typically takes 60-90 seconds. Please don't close this page.</p>
+            <p style="font-size: 1.1rem; font-weight: 600;">Redirecting to checkout...</p>
         </div>
 
         <div id="result">
@@ -224,9 +269,14 @@
 
 {% block scripts %}
 <script>
-// Capture source from URL params (e.g., /order?source=fiverr)
+// Show cancelled banner if redirected from Stripe cancel
 const urlParams = new URLSearchParams(window.location.search);
-const source = urlParams.get('source') || 'direct';
+if (urlParams.get('cancelled') === 'true') {
+    document.getElementById('cancelled-msg').style.display = 'block';
+}
+
+// Capture source from URL params
+const source = urlParams.get('source') || 'website';
 document.getElementById('source').value = source;
 
 const form = document.getElementById('intake-form');
@@ -250,60 +300,36 @@ form.addEventListener('submit', async (e) => {
         source: document.getElementById('source').value,
     };
 
-    orderForm.style.display = 'none';
-    loading.style.display = 'block';
     errorMsg.style.display = 'none';
 
     try {
-        // Create the order
-        const resp = await fetch('/api/v1/orders', {
+        // Try Stripe checkout first
+        const resp = await fetch('/api/v1/checkout', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data),
         });
 
-        if (!resp.ok) throw new Error((await resp.json()).detail || 'Order failed');
+        const respData = await resp.json();
 
-        const order = await resp.json();
+        if (resp.ok && respData.checkout_url) {
+            orderForm.style.display = 'none';
+            loading.style.display = 'block';
+            window.location.href = respData.checkout_url;
+            return;
+        }
 
-        // Poll for completion
-        const statusUrl = `/api/v1/orders/${order.order_id}?key=${new URL(order.status_url).searchParams.get('key')}`;
-        let attempts = 0;
-        const maxAttempts = 60; // 5 minutes max
+        // If Stripe not configured (503), show message
+        if (resp.status === 503) {
+            errorMsg.innerHTML = 'Online payments are being set up. Please email <a href="mailto:insightforge@azriel.io" style="color: var(--accent);">insightforge@azriel.io</a> to order your report.';
+            errorMsg.style.display = 'block';
+            btn.disabled = false;
+            return;
+        }
 
-        const poll = setInterval(async () => {
-            attempts++;
-            try {
-                const statusResp = await fetch(statusUrl);
-                const status = await statusResp.json();
-
-                if (status.status === 'completed' && status.report_url) {
-                    clearInterval(poll);
-                    loading.style.display = 'none';
-                    result.style.display = 'block';
-                    document.getElementById('report-link').innerHTML =
-                        `<a href="${status.report_url}" target="_blank">${status.report_url}</a>`;
-                    document.getElementById('view-report-btn').href = status.report_url;
-                } else if (status.status === 'failed') {
-                    clearInterval(poll);
-                    throw new Error('Report generation failed. Please try again.');
-                } else if (attempts >= maxAttempts) {
-                    clearInterval(poll);
-                    throw new Error('Report is taking longer than expected. Please check back using your status URL.');
-                }
-            } catch (err) {
-                clearInterval(poll);
-                loading.style.display = 'none';
-                orderForm.style.display = 'block';
-                errorMsg.textContent = err.message;
-                errorMsg.style.display = 'block';
-                btn.disabled = false;
-            }
-        }, 5000); // Check every 5 seconds
+        throw new Error(respData.detail || 'Checkout failed');
 
     } catch (err) {
-        orderForm.style.display = 'block';
-        loading.style.display = 'none';
         errorMsg.textContent = `Error: ${err.message}`;
         errorMsg.style.display = 'block';
         btn.disabled = false;

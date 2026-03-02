@@ -13,4 +13,5 @@ dependencies = [
     "pydantic>=2.10.0",
     "python-dotenv>=1.0.0",
     "markdown>=3.7",
+    "stripe>=8.0.0",
 ]

@@ -5,8 +5,15 @@ services:
     restart: unless-stopped
     ports:
       - "8000:8000"
+    volumes:
+      - insightforge_data:/app/data
     environment:
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - ADMIN_API_KEY=${ADMIN_API_KEY}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - BASE_URL=${BASE_URL:-https://insightforge.azriel.io}
+      - DATABASE_PATH=/app/data/insightforge.db
       - PORT=8000
     env_file:
       - .env
@@ -16,3 +23,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
+
+volumes:
+  insightforge_data:

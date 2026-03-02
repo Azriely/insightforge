@@ -32,92 +32,18 @@
     .stat-number { font-size: 2rem; font-weight: 700; color: var(--accent); }
     .stat-label { font-size: 0.85rem; color: var(--text-muted); }
 
-    .form-section {
-        background: var(--bg-card);
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        padding: 48px;
-        max-width: 700px;
-        margin: 0 auto 80px;
-    }
-    .form-section h2 {
-        font-size: 1.5rem;
-        margin-bottom: 8px;
-    }
-    .form-section .subtitle {
-        color: var(--text-muted);
-        margin-bottom: 32px;
-    }
-    .form-group {
-        margin-bottom: 20px;
-    }
-    .form-group label {
-        display: block;
-        font-size: 0.9rem;
-        font-weight: 600;
-        margin-bottom: 6px;
-    }
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-        width: 100%;
-        padding: 12px 16px;
-        background: var(--bg-input);
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        color: var(--text);
-        font-size: 1rem;
-        font-family: inherit;
-    }
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-        outline: none;
-        border-color: var(--primary);
-    }
-    .form-group textarea { resize: vertical; min-height: 100px; }
-    .form-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-    }
-    .submit-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 28px;
-    }
-    .price-tag {
-        color: var(--success);
-        font-weight: 700;
-        font-size: 1.1rem;
-    }
-    .price-tag .free { color: var(--accent); }
-
-    #loading {
-        display: none;
+    .cta-section {
         text-align: center;
-        padding: 40px;
+        margin-bottom: 80px;
     }
-    #loading .spinner {
-        width: 48px;
-        height: 48px;
-        border: 4px solid var(--border);
-        border-top-color: var(--primary);
-        border-radius: 50%;
-        animation: spin 0.8s linear infinite;
-        margin: 0 auto 16px;
+    .cta-section .btn {
+        font-size: 1.15rem;
+        padding: 16px 40px;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    #error-msg {
-        display: none;
-        background: #7f1d1d;
-        border: 1px solid #991b1b;
-        padding: 12px 16px;
-        border-radius: 8px;
-        margin-top: 16px;
+    .cta-subtitle {
+        color: var(--text-muted);
         font-size: 0.9rem;
+        margin-top: 12px;
     }
 
     .features {
@@ -140,6 +66,40 @@
         color: var(--text-muted);
         font-size: 0.9rem;
     }
+
+    .how-it-works {
+        text-align: center;
+        margin-bottom: 80px;
+    }
+    .how-it-works h2 {
+        font-size: 2rem;
+        margin-bottom: 40px;
+    }
+    .steps-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+    }
+    .step-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 28px;
+    }
+    .step-num {
+        display: inline-block;
+        width: 36px;
+        height: 36px;
+        background: var(--primary);
+        color: white;
+        border-radius: 50%;
+        line-height: 36px;
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 12px;
+    }
+    .step-card h3 { font-size: 1.05rem; margin-bottom: 6px; }
+    .step-card p { color: var(--text-muted); font-size: 0.9rem; }
 
     .pricing {
         text-align: center;
@@ -208,11 +168,33 @@
         font-weight: 700;
     }
 
+    .waitlist-section {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 48px;
+        max-width: 500px;
+        margin: 0 auto 80px;
+        text-align: center;
+    }
+    .waitlist-section h2 { margin-bottom: 8px; }
+    .waitlist-section .subtitle { color: var(--text-muted); margin-bottom: 24px; }
+    .waitlist-section .form-group { margin-bottom: 16px; }
+    .waitlist-section input {
+        width: 100%;
+        padding: 12px 16px;
+        background: var(--bg-input);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        color: var(--text);
+        font-size: 1rem;
+    }
+    .waitlist-section input:focus { outline: none; border-color: var(--primary); }
+
     @media (max-width: 768px) {
         .hero h1 { font-size: 2rem; }
         .stats-bar { gap: 24px; }
-        .form-row { grid-template-columns: 1fr; }
-        .features, .pricing-cards { grid-template-columns: 1fr; }
+        .features, .pricing-cards, .steps-row { grid-template-columns: 1fr; }
     }
 </style>
 {% endblock %}
@@ -230,8 +212,8 @@
             <div class="stat-label">Average delivery time</div>
         </div>
         <div class="stat">
-            <div class="stat-number">95%</div>
-            <div class="stat-label">Accuracy rate</div>
+            <div class="stat-number">4</div>
+            <div class="stat-label">Report types</div>
         </div>
         <div class="stat">
             <div class="stat-number">$49</div>
@@ -239,28 +221,29 @@
         </div>
     </div>
 
-    <section class="form-section" id="how-it-works">
-        <div style="text-align: center; margin-bottom: 24px;">
-            <span style="background: var(--primary); color: white; font-size: 0.75rem; font-weight: 700; padding: 4px 14px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.05em;">Launching Soon</span>
-        </div>
-        <h2 style="text-align: center;">Get Early Access</h2>
-        <p class="subtitle" style="text-align: center;">Self-service reports launching soon. Join the waitlist and be first in line.</p>
+    <section class="cta-section">
+        <a href="/order" class="btn btn-primary">Get Your Report Now</a>
+        <p class="cta-subtitle">Comprehensive analysis delivered in under 2 minutes. No subscription required.</p>
+    </section>
 
-        <form id="waitlist-form" style="max-width: 440px; margin: 0 auto;">
-            <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" placeholder="you@company.com" required>
+    <section class="how-it-works" id="how-it-works">
+        <h2>How It Works</h2>
+        <div class="steps-row">
+            <div class="step-card">
+                <div class="step-num">1</div>
+                <h3>Tell Us What You Need</h3>
+                <p>Enter your company, industry, and research question. Choose from 4 report types.</p>
             </div>
-            <button type="submit" class="btn btn-primary" style="width: 100%;" id="waitlist-btn">Join the Waitlist</button>
-            <div id="waitlist-msg" style="display: none; text-align: center; margin-top: 16px; padding: 12px; border-radius: 8px;"></div>
-        </form>
-
-        <div style="text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border);">
-            <p style="color: var(--text-muted); font-size: 0.9rem;">Need a report <strong style="color: var(--accent);">right now</strong>?</p>
-            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">
-                We deliver custom market research reports within 24 hours.
-                <br><a href="mailto:insightforge@azriel.io" style="color: var(--accent);">insightforge@azriel.io</a> &middot; Starting at $75/report
-            </p>
+            <div class="step-card">
+                <div class="step-num">2</div>
+                <h3>Pay Securely</h3>
+                <p>Quick checkout via Stripe. $49 per report, no hidden fees.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-num">3</div>
+                <h3>Get Your Report</h3>
+                <p>AI generates your report in 60-90 seconds. View online or export to PDF.</p>
+            </div>
         </div>
     </section>
 
@@ -271,11 +254,11 @@
         </div>
         <div class="feature-card">
             <h3>Instant Delivery</h3>
-            <p>No waiting days for a consultant. Get your report in 30-90 seconds, ready to present to your team or investors.</p>
+            <p>No waiting days for a consultant. Get your report in 60-90 seconds, ready to present to your team or investors.</p>
         </div>
         <div class="feature-card">
-            <h3>API Access</h3>
-            <p>Integrate market research directly into your workflows with our REST API. Perfect for product teams and analysts.</p>
+            <h3>4 Report Types</h3>
+            <p>Comprehensive market analysis, competitive intelligence, SWOT analysis, or market sizing (TAM/SAM/SOM).</p>
         </div>
     </section>
 
@@ -283,15 +266,15 @@
         <h2>Simple Pricing</h2>
         <div class="pricing-cards">
             <div class="pricing-card">
-                <h3>Starter</h3>
+                <h3>Single Report</h3>
                 <div class="price">$49<span>/report</span></div>
                 <ul>
                     <li>Any analysis type</li>
                     <li>Full detailed report</li>
                     <li>PDF export</li>
-                    <li>Email delivery</li>
+                    <li>Delivered in 60 seconds</li>
                 </ul>
-                <a href="#how-it-works" class="btn btn-primary" style="width: 100%;">Get Started</a>
+                <a href="/order" class="btn btn-primary" style="width: 100%;">Get Started</a>
             </div>
             <div class="pricing-card featured">
                 <h3>Professional</h3>
@@ -303,7 +286,7 @@
                     <li>Priority generation</li>
                     <li>Report history</li>
                 </ul>
-                <a href="#how-it-works" class="btn btn-primary" style="width: 100%;">Subscribe</a>
+                <a href="mailto:insightforge@azriel.io?subject=Professional%20Plan" class="btn btn-primary" style="width: 100%;">Contact Us</a>
             </div>
             <div class="pricing-card">
                 <h3>Enterprise</h3>
@@ -315,9 +298,21 @@
                     <li>Dedicated support</li>
                     <li>White-label option</li>
                 </ul>
-                <a href="#how-it-works" class="btn btn-primary" style="width: 100%;">Contact Us</a>
+                <a href="mailto:insightforge@azriel.io?subject=Enterprise%20Plan" class="btn btn-primary" style="width: 100%;">Contact Us</a>
             </div>
         </div>
+    </section>
+
+    <section class="waitlist-section" id="updates">
+        <h2>Stay Updated</h2>
+        <p class="subtitle">Get notified about new features, report types, and special offers.</p>
+        <form id="waitlist-form">
+            <div class="form-group">
+                <input type="email" id="email" name="email" placeholder="you@company.com" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;" id="waitlist-btn">Subscribe</button>
+            <div id="waitlist-msg" style="display: none; margin-top: 12px; padding: 12px; border-radius: 8px;"></div>
+        </form>
     </section>
 </div>
 {% endblock %}
@@ -331,7 +326,7 @@ form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = document.getElementById('waitlist-btn');
     btn.disabled = true;
-    btn.textContent = 'Joining...';
+    btn.textContent = 'Subscribing...';
 
     try {
         const resp = await fetch('/api/v1/waitlist', {
@@ -344,14 +339,14 @@ form.addEventListener('submit', async (e) => {
         msg.style.background = '#064e3b';
         msg.style.color = '#6ee7b7';
         msg.textContent = data.message;
-        btn.textContent = 'You\'re on the list!';
+        btn.textContent = "You're subscribed!";
     } catch (err) {
         msg.style.display = 'block';
         msg.style.background = '#7f1d1d';
         msg.style.color = '#fca5a5';
         msg.textContent = 'Something went wrong. Please try again.';
         btn.disabled = false;
-        btn.textContent = 'Join the Waitlist';
+        btn.textContent = 'Subscribe';
     }
 });
 </script>
