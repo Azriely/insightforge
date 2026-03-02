@@ -27,7 +27,7 @@ My reports run 2,000-4,000 words and are formatted with clear sections, data poi
 **Turnaround:** 24 hours from kickoff.
 
 I've linked a sample Shopify e-commerce market analysis below so you can judge the quality:
-https://insightforge.azriel.io/report/rpt_1772427934_0114
+https://insightforge.azriel.io/report/rpt_1772432615_28e03758
 
 Happy to discuss scope or answer any questions.
 
@@ -55,7 +55,7 @@ Competitive intelligence is my specialty. For [their company/product], I'll put 
 
 Every data point comes with context. Every recommendation is specific and actionable.
 
-I deliver within 24 hours. Here's a sample competitive analysis I did for Notion in the productivity software space: https://insightforge.azriel.io/report/rpt_1772426497_6224
+I deliver within 24 hours. Here's a sample competitive analysis I did for Notion in the productivity software space: https://insightforge.azriel.io/report/rpt_1772432610_3baa0960
 
 What specific competitors are you most concerned about? That'll help me focus the analysis where it matters most.
 
@@ -89,7 +89,7 @@ I help startups build the market research sections investors actually want to se
 - Growth drivers and potential inhibitors
 - Revenue model benchmarks from comparable companies
 
-I've done this for startups across EdTech, FinTech, HealthTech, and SaaS. Here's a sample market sizing analysis I did for an AI tutoring startup: https://insightforge.azriel.io/report/rpt_1772427945_2788
+I've done this for startups across EdTech, FinTech, HealthTech, and SaaS. Here's a sample market sizing analysis I did for an AI tutoring startup: https://insightforge.azriel.io/report/rpt_1772432615_28e03758
 
 The output is structured and ready to drop into your deck's appendix or use for the "Market Opportunity" slides.
 
@@ -117,7 +117,7 @@ My SWOT analyses go beyond the basic 2x2 grid:
 - **Priority actions** — ranked list of 5-7 immediate strategic moves based on the analysis
 - **Probability and impact ratings** for each threat
 
-Here's a sample SWOT I did for Beyond Meat in the plant-based food industry: https://insightforge.azriel.io/report/rpt_1772427922_9890
+Here's a sample SWOT I did for Beyond Meat in the plant-based food industry: https://insightforge.azriel.io/report/rpt_1772432630_66433a1a
 
 Quick question: is this SWOT for internal planning, for investors, or for a business plan? That helps me calibrate the depth and tone.
 
