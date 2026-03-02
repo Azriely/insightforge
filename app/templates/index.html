@@ -1,320 +1,830 @@
 {% extends "base.html" %}
 
-{% block title %}AI Market Research in Minutes{% endblock %}
+{% block title %}AI Market Research Reports in 60 Seconds{% endblock %}
 
 {% block head %}
 <style>
+    /* ---- Hero ---- */
     .hero {
+        position: relative;
+        padding: 100px 0 80px;
         text-align: center;
-        padding: 80px 0 60px;
+        overflow: hidden;
+    }
+    .hero::before {
+        content: '';
+        position: absolute;
+        top: -40%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 800px;
+        height: 800px;
+        background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--accent-glow);
+        border: 1px solid rgba(56, 189, 248, 0.2);
+        padding: 6px 16px;
+        border-radius: 100px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--accent);
+        margin-bottom: 24px;
+    }
+    .hero-badge .dot {
+        width: 6px;
+        height: 6px;
+        background: var(--success);
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.4; }
     }
     .hero h1 {
-        font-size: 3rem;
+        font-size: 3.5rem;
         font-weight: 800;
-        line-height: 1.15;
+        line-height: 1.1;
         margin-bottom: 20px;
+        letter-spacing: -0.03em;
+        position: relative;
     }
-    .hero h1 .highlight { color: var(--accent); }
+    .hero h1 .gradient {
+        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
     .hero p {
         font-size: 1.2rem;
         color: var(--text-muted);
-        max-width: 600px;
-        margin: 0 auto 40px;
+        max-width: 560px;
+        margin: 0 auto 36px;
+        line-height: 1.7;
+    }
+    .hero-cta {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-bottom: 48px;
     }
 
-    .stats-bar {
+    /* ---- Trust Bar ---- */
+    .trust-bar {
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        padding: 20px 0;
+        background: var(--bg-surface);
+    }
+    .trust-items {
         display: flex;
         justify-content: center;
-        gap: 48px;
-        margin-bottom: 60px;
+        align-items: center;
+        gap: 40px;
+        flex-wrap: wrap;
     }
-    .stat { text-align: center; }
-    .stat-number { font-size: 2rem; font-weight: 700; color: var(--accent); }
-    .stat-label { font-size: 0.85rem; color: var(--text-muted); }
-
-    .cta-section {
-        text-align: center;
-        margin-bottom: 80px;
-    }
-    .cta-section .btn {
-        font-size: 1.15rem;
-        padding: 16px 40px;
-    }
-    .cta-subtitle {
+    .trust-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
         color: var(--text-muted);
-        font-size: 0.9rem;
-        margin-top: 12px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+    .trust-icon {
+        width: 18px;
+        height: 18px;
+        color: var(--accent);
     }
 
-    .features {
+    /* ---- Stats ---- */
+    .stats-row {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(4, 1fr);
         gap: 24px;
-        margin-bottom: 80px;
+        padding: 60px 0;
     }
-    .feature-card {
+    .stat-card {
+        text-align: center;
+        padding: 24px;
         background: var(--bg-card);
         border: 1px solid var(--border);
         border-radius: 12px;
-        padding: 28px;
     }
-    .feature-card h3 {
-        font-size: 1.1rem;
-        margin-bottom: 8px;
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--accent), var(--primary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
-    .feature-card p {
+    .stat-label {
+        font-size: 0.85rem;
         color: var(--text-muted);
-        font-size: 0.9rem;
+        margin-top: 4px;
     }
 
-    .how-it-works {
-        text-align: center;
-        margin-bottom: 80px;
-    }
-    .how-it-works h2 {
-        font-size: 2rem;
-        margin-bottom: 40px;
-    }
-    .steps-row {
+    /* ---- How It Works ---- */
+    .steps-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 24px;
+        margin-top: 48px;
     }
     .step-card {
         background: var(--bg-card);
         border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 28px;
+        border-radius: 16px;
+        padding: 32px;
+        position: relative;
+        transition: border-color 0.3s, transform 0.3s;
+    }
+    .step-card:hover {
+        border-color: var(--border-light);
+        transform: translateY(-2px);
     }
     .step-num {
-        display: inline-block;
-        width: 36px;
-        height: 36px;
-        background: var(--primary);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
         color: white;
-        border-radius: 50%;
-        line-height: 36px;
-        font-size: 1rem;
+        border-radius: 12px;
         font-weight: 700;
+        font-size: 1.1rem;
+        margin-bottom: 16px;
+    }
+    .step-card h3 { font-size: 1.1rem; margin-bottom: 8px; }
+    .step-card p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.7; }
+
+    /* ---- Features ---- */
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+        margin-top: 48px;
+    }
+    .feature-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 32px;
+        transition: border-color 0.3s, transform 0.3s;
+    }
+    .feature-card:hover {
+        border-color: var(--border-light);
+        transform: translateY(-2px);
+    }
+    .feature-icon {
+        width: 44px;
+        height: 44px;
+        background: var(--primary-glow);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 16px;
+        color: var(--accent);
+    }
+    .feature-icon svg { width: 22px; height: 22px; }
+    .feature-card h3 { font-size: 1.05rem; margin-bottom: 8px; }
+    .feature-card p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.7; }
+
+    /* ---- Sample Report ---- */
+    .sample-section {
+        background: var(--bg-surface);
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+    }
+    .sample-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 48px;
+        align-items: center;
+        margin-top: 40px;
+    }
+    .sample-content h3 {
+        font-size: 1.3rem;
         margin-bottom: 12px;
     }
-    .step-card h3 { font-size: 1.05rem; margin-bottom: 6px; }
-    .step-card p { color: var(--text-muted); font-size: 0.9rem; }
+    .sample-content p {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        line-height: 1.7;
+        margin-bottom: 20px;
+    }
+    .sample-list {
+        list-style: none;
+        margin-bottom: 24px;
+    }
+    .sample-list li {
+        padding: 6px 0;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .sample-list .check {
+        color: var(--success);
+        font-weight: 700;
+        font-size: 1rem;
+    }
+    .sample-preview {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 24px;
+        max-height: 420px;
+        overflow: hidden;
+        position: relative;
+        font-size: 0.8rem;
+        line-height: 1.6;
+        color: var(--text-muted);
+    }
+    .sample-preview h4 { color: var(--text); font-size: 0.95rem; margin-bottom: 8px; }
+    .sample-preview::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 120px;
+        background: linear-gradient(transparent, var(--bg-card));
+        pointer-events: none;
+    }
 
-    .pricing {
+    /* ---- Use Cases ---- */
+    .usecases-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin-top: 48px;
+    }
+    .usecase-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 24px;
         text-align: center;
-        margin-bottom: 80px;
+        transition: border-color 0.3s;
     }
-    .pricing h2 {
-        font-size: 2rem;
-        margin-bottom: 40px;
-    }
+    .usecase-card:hover { border-color: var(--border-light); }
+    .usecase-emoji { font-size: 2rem; margin-bottom: 12px; }
+    .usecase-card h3 { font-size: 0.95rem; margin-bottom: 6px; }
+    .usecase-card p { color: var(--text-muted); font-size: 0.8rem; line-height: 1.6; }
+
+    /* ---- Pricing ---- */
     .pricing-cards {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 24px;
+        margin-top: 48px;
     }
     .pricing-card {
         background: var(--bg-card);
         border: 1px solid var(--border);
         border-radius: 16px;
-        padding: 32px;
-        text-align: center;
+        padding: 36px;
     }
     .pricing-card.featured {
         border-color: var(--primary);
         position: relative;
+        box-shadow: 0 0 40px rgba(37, 99, 235, 0.15);
     }
     .pricing-card.featured::before {
-        content: "MOST POPULAR";
+        content: "BEST VALUE";
         position: absolute;
         top: -12px;
         left: 50%;
         transform: translateX(-50%);
-        background: var(--primary);
+        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
         color: white;
         font-size: 0.7rem;
         font-weight: 700;
-        padding: 4px 12px;
-        border-radius: 20px;
+        padding: 5px 16px;
+        border-radius: 100px;
+        letter-spacing: 0.05em;
     }
-    .pricing-card h3 {
-        font-size: 1.2rem;
-        margin-bottom: 8px;
-    }
+    .pricing-card h3 { font-size: 1.1rem; margin-bottom: 4px; }
+    .pricing-card .price-desc { color: var(--text-dim); font-size: 0.85rem; margin-bottom: 20px; }
     .pricing-card .price {
-        font-size: 2.5rem;
+        font-size: 2.8rem;
         font-weight: 800;
-        margin: 16px 0;
+        margin-bottom: 4px;
+        letter-spacing: -0.03em;
     }
     .pricing-card .price span {
         font-size: 1rem;
         font-weight: 400;
         color: var(--text-muted);
     }
+    .pricing-card .price-note {
+        font-size: 0.8rem;
+        color: var(--text-dim);
+        margin-bottom: 24px;
+    }
     .pricing-card ul {
         list-style: none;
-        margin: 20px 0;
-        text-align: left;
+        margin-bottom: 28px;
     }
     .pricing-card li {
-        padding: 6px 0;
+        padding: 8px 0;
         font-size: 0.9rem;
         color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
-    .pricing-card li::before {
-        content: "\2713 ";
-        color: var(--success);
-        font-weight: 700;
-    }
+    .pricing-card li .check { color: var(--success); font-weight: 700; }
 
-    .waitlist-section {
-        background: var(--bg-card);
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        padding: 48px;
-        max-width: 500px;
-        margin: 0 auto 80px;
-        text-align: center;
+    /* ---- FAQ ---- */
+    .faq-list {
+        max-width: 720px;
+        margin: 48px auto 0;
     }
-    .waitlist-section h2 { margin-bottom: 8px; }
-    .waitlist-section .subtitle { color: var(--text-muted); margin-bottom: 24px; }
-    .waitlist-section .form-group { margin-bottom: 16px; }
-    .waitlist-section input {
+    .faq-item {
+        border-bottom: 1px solid var(--border);
+    }
+    .faq-question {
         width: 100%;
-        padding: 12px 16px;
-        background: var(--bg-input);
-        border: 1px solid var(--border);
-        border-radius: 8px;
+        background: none;
+        border: none;
         color: var(--text);
         font-size: 1rem;
+        font-weight: 600;
+        padding: 20px 0;
+        text-align: left;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-family: inherit;
     }
-    .waitlist-section input:focus { outline: none; border-color: var(--primary); }
+    .faq-question:hover { color: var(--accent); }
+    .faq-arrow {
+        transition: transform 0.3s;
+        color: var(--text-muted);
+        font-size: 1.2rem;
+    }
+    .faq-answer {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease, padding 0.3s ease;
+    }
+    .faq-answer-inner {
+        padding-bottom: 20px;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        line-height: 1.7;
+    }
+    .faq-item.open .faq-answer { max-height: 300px; }
+    .faq-item.open .faq-arrow { transform: rotate(45deg); }
+
+    /* ---- Final CTA ---- */
+    .final-cta {
+        text-align: center;
+        padding: 80px 0;
+        position: relative;
+    }
+    .final-cta::before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(124, 58, 237, 0.08) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    .final-cta h2 {
+        font-size: 2.2rem;
+        font-weight: 800;
+        margin-bottom: 16px;
+        letter-spacing: -0.02em;
+    }
+    .final-cta p {
+        color: var(--text-muted);
+        font-size: 1.1rem;
+        margin-bottom: 32px;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* ---- Waitlist ---- */
+    .waitlist-box {
+        max-width: 440px;
+        margin: 40px auto 0;
+    }
+    .waitlist-row {
+        display: flex;
+        gap: 8px;
+    }
+    .waitlist-row input {
+        flex: 1;
+        padding: 12px 16px;
+        background: var(--bg-input);
+        border: 1px solid var(--border-light);
+        border-radius: 8px;
+        color: var(--text);
+        font-size: 0.95rem;
+        font-family: inherit;
+    }
+    .waitlist-row input:focus { outline: none; border-color: var(--primary); }
 
     @media (max-width: 768px) {
-        .hero h1 { font-size: 2rem; }
-        .stats-bar { gap: 24px; }
-        .features, .pricing-cards, .steps-row { grid-template-columns: 1fr; }
+        .hero { padding: 60px 0 40px; }
+        .hero h1 { font-size: 2.2rem; }
+        .hero p { font-size: 1rem; }
+        .stats-row { grid-template-columns: repeat(2, 1fr); }
+        .steps-grid, .features-grid, .pricing-cards { grid-template-columns: 1fr; }
+        .usecases-grid { grid-template-columns: repeat(2, 1fr); }
+        .sample-grid { grid-template-columns: 1fr; }
+        .trust-items { gap: 20px; }
+        .final-cta h2 { font-size: 1.8rem; }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container">
-    <section class="hero">
-        <h1>Consulting-Quality<br><span class="highlight">Market Research</span><br>In 60 Seconds</h1>
-        <p>Get detailed competitive analysis, market sizing, and strategic recommendations powered by AI. Reports that would cost $5,000 from McKinsey, delivered instantly.</p>
-    </section>
 
-    <div class="stats-bar">
-        <div class="stat">
-            <div class="stat-number">60s</div>
-            <div class="stat-label">Average delivery time</div>
+<!-- Hero -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-badge">
+            <span class="dot"></span>
+            Reports generating now
         </div>
-        <div class="stat">
-            <div class="stat-number">4</div>
-            <div class="stat-label">Report types</div>
-        </div>
-        <div class="stat">
-            <div class="stat-number">$49</div>
-            <div class="stat-label">Per report</div>
+        <h1>Market Research That<br>Takes <span class="gradient">60 Seconds</span>,<br>Not 6 Weeks</h1>
+        <p>Get the competitive analysis, market sizing, and strategic insights your business needs. AI-powered reports that rival $5,000 consulting engagements.</p>
+        <div class="hero-cta">
+            <a href="/order" class="btn btn-primary btn-lg">Get Your Report &mdash; $49</a>
+            <a href="#sample" class="btn btn-outline btn-lg">See Sample Report</a>
         </div>
     </div>
+</section>
 
-    <section class="cta-section">
-        <a href="/order" class="btn btn-primary">Get Your Report Now</a>
-        <p class="cta-subtitle">Comprehensive analysis delivered in under 2 minutes. No subscription required.</p>
-    </section>
+<!-- Trust Bar -->
+<div class="trust-bar">
+    <div class="container">
+        <div class="trust-items">
+            <div class="trust-item">
+                <svg class="trust-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                60-Second Delivery
+            </div>
+            <div class="trust-item">
+                <svg class="trust-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                Secure Stripe Payments
+            </div>
+            <div class="trust-item">
+                <svg class="trust-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                Powered by Claude AI
+            </div>
+            <div class="trust-item">
+                <svg class="trust-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                Satisfaction Guaranteed
+            </div>
+        </div>
+    </div>
+</div>
 
-    <section class="how-it-works" id="how-it-works">
-        <h2>How It Works</h2>
-        <div class="steps-row">
+<!-- Stats -->
+<div class="container">
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-number">60s</div>
+            <div class="stat-label">Average delivery</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">3,500+</div>
+            <div class="stat-label">Words per report</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">4</div>
+            <div class="stat-label">Analysis types</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">99%</div>
+            <div class="stat-label">Uptime</div>
+        </div>
+    </div>
+</div>
+
+<!-- How It Works -->
+<section class="section" id="how-it-works">
+    <div class="container text-center">
+        <span class="section-label">How It Works</span>
+        <h2 class="section-title">Your Report in 3 Simple Steps</h2>
+        <p class="section-subtitle mx-auto">No consultants, no waiting weeks. Tell us what you need and get your analysis instantly.</p>
+
+        <div class="steps-grid">
             <div class="step-card">
                 <div class="step-num">1</div>
-                <h3>Tell Us What You Need</h3>
-                <p>Enter your company, industry, and research question. Choose from 4 report types.</p>
+                <h3>Describe Your Research</h3>
+                <p>Enter the company, industry, and specific question you need answered. Choose from comprehensive analysis, competitive intel, SWOT, or market sizing.</p>
             </div>
             <div class="step-card">
                 <div class="step-num">2</div>
-                <h3>Pay Securely</h3>
-                <p>Quick checkout via Stripe. $49 per report, no hidden fees.</p>
+                <h3>Secure Checkout</h3>
+                <p>Pay $49 securely via Stripe. No subscription required, no hidden fees. Your report starts generating the moment payment confirms.</p>
             </div>
             <div class="step-card">
                 <div class="step-num">3</div>
                 <h3>Get Your Report</h3>
-                <p>AI generates your report in 60-90 seconds. View online or export to PDF.</p>
+                <p>Your detailed report is ready in about 60 seconds. View it online, export to PDF, or copy the markdown. It's yours to keep forever.</p>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <section class="features">
-        <div class="feature-card">
-            <h3>Comprehensive Analysis</h3>
-            <p>Market overview, competitive landscape, SWOT, customer segmentation, and strategic recommendations in a single report.</p>
-        </div>
-        <div class="feature-card">
-            <h3>Instant Delivery</h3>
-            <p>No waiting days for a consultant. Get your report in 60-90 seconds, ready to present to your team or investors.</p>
-        </div>
-        <div class="feature-card">
-            <h3>4 Report Types</h3>
-            <p>Comprehensive market analysis, competitive intelligence, SWOT analysis, or market sizing (TAM/SAM/SOM).</p>
-        </div>
-    </section>
+<!-- Features -->
+<section class="section" id="features">
+    <div class="container text-center">
+        <span class="section-label">What You Get</span>
+        <h2 class="section-title">Everything a $5K Report Includes</h2>
+        <p class="section-subtitle mx-auto">Each report is structured with the frameworks used by McKinsey, BCG, and Bain &mdash; at a fraction of the cost.</p>
 
-    <section class="pricing" id="pricing">
-        <h2>Simple Pricing</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                </div>
+                <h3>Market Sizing</h3>
+                <p>TAM, SAM, and SOM estimates with top-down and bottom-up methodology. Growth projections and revenue model analysis included.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                </div>
+                <h3>Competitive Intelligence</h3>
+                <p>5-10 competitor breakdowns with pricing, positioning, market share estimates, strengths, weaknesses, and white space opportunities.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+                </div>
+                <h3>SWOT Analysis</h3>
+                <p>8-12 items per quadrant with detailed explanations. Includes cross-analysis matrix (SO, WO, ST, WT strategies) and priority actions.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                </div>
+                <h3>Strategic Recommendations</h3>
+                <p>Actionable short-term (0-6 months), medium-term (6-18 months), and long-term (18+ months) strategic initiatives with clear rationale.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <h3>Financial Indicators</h3>
+                <p>Revenue potential estimates, cost structure analysis, unit economics frameworks, and pricing strategy benchmarks from comparable companies.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                </div>
+                <h3>Risk Assessment</h3>
+                <p>Top risks identified with probability, impact rating, and specific mitigation strategies. Threat assessment with defensive recommendations.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sample Report -->
+<section class="section sample-section" id="sample">
+    <div class="container">
+        <div class="text-center">
+            <span class="section-label">See the Quality</span>
+            <h2 class="section-title">Sample Reports You Can Read Right Now</h2>
+            <p class="section-subtitle mx-auto">Don't take our word for it. Read actual reports generated by InsightForge.</p>
+        </div>
+
+        <div class="sample-grid" style="margin-top: 48px;">
+            <div class="sample-content">
+                <h3>Real reports, real insights</h3>
+                <p>Every report is 2,000-4,000+ words of structured analysis with specific data points, market estimates, and actionable recommendations. No generic filler.</p>
+                <ul class="sample-list">
+                    <li><span class="check">&#10003;</span> Executive summary with key findings</li>
+                    <li><span class="check">&#10003;</span> Detailed competitor breakdowns with pricing</li>
+                    <li><span class="check">&#10003;</span> Market sizing with methodology</li>
+                    <li><span class="check">&#10003;</span> Strategic recommendations with timelines</li>
+                    <li><span class="check">&#10003;</span> Risk assessment and mitigation strategies</li>
+                </ul>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <a href="/report/rpt_1772427934_0114" class="btn btn-primary" target="_blank">Read: Shopify Market Analysis</a>
+                    <a href="/report/rpt_1772426497_6224" class="btn btn-outline" target="_blank">Read: Notion Competitive Intel</a>
+                    <a href="/report/rpt_1772427922_9890" class="btn btn-outline" target="_blank">Read: Beyond Meat SWOT</a>
+                </div>
+            </div>
+            <div class="sample-preview">
+                <h4>Competitive Intelligence Report: Shopify</h4>
+                <p><strong>Executive Summary</strong></p>
+                <p>Shopify operates in the highly competitive e-commerce platform market, valued at approximately $7.1B and growing at 14.7% CAGR. The company has successfully positioned itself as the leading independent e-commerce platform for SMBs while expanding aggressively into enterprise with Commerce Components...</p>
+                <p><strong>Key Findings:</strong></p>
+                <p>- Shopify's merchant-first approach and extensive app ecosystem remain its strongest competitive advantages<br>
+                - Pricing strategy is competitive but faces pressure from free/low-cost alternatives<br>
+                - Primary growth opportunities lie in international expansion and B2B commerce<br>
+                - AI-powered commerce tools represent both an opportunity and competitive threat...</p>
+                <p><strong>Competitor Identification</strong></p>
+                <p>Direct Competitors: WooCommerce, BigCommerce, Wix eCommerce, Squarespace Commerce, Adobe Commerce (Magento)...</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Use Cases -->
+<section class="section">
+    <div class="container text-center">
+        <span class="section-label">Who It's For</span>
+        <h2 class="section-title">Built for People Who Need Answers Fast</h2>
+        <p class="section-subtitle mx-auto">Whether you're pitching investors or entering a new market, get the research you need in minutes.</p>
+
+        <div class="usecases-grid">
+            <div class="usecase-card">
+                <div class="usecase-emoji">&#x1F680;</div>
+                <h3>Startup Founders</h3>
+                <p>Market sizing and competitive analysis for your pitch deck and investor meetings.</p>
+            </div>
+            <div class="usecase-card">
+                <div class="usecase-emoji">&#x1F4BC;</div>
+                <h3>Business Consultants</h3>
+                <p>Professional-grade reports for your clients at a fraction of the research time.</p>
+            </div>
+            <div class="usecase-card">
+                <div class="usecase-emoji">&#x1F4CA;</div>
+                <h3>Product Managers</h3>
+                <p>Competitive intelligence and market trends to inform your product roadmap.</p>
+            </div>
+            <div class="usecase-card">
+                <div class="usecase-emoji">&#x1F393;</div>
+                <h3>MBA Students</h3>
+                <p>Case study research and market analysis for academic projects and assignments.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Pricing -->
+<section class="section" id="pricing">
+    <div class="container text-center">
+        <span class="section-label">Pricing</span>
+        <h2 class="section-title">One Report or Monthly &mdash; You Choose</h2>
+        <p class="section-subtitle mx-auto">No surprises. Pay per report or save with a monthly plan.</p>
+
         <div class="pricing-cards">
             <div class="pricing-card">
                 <h3>Single Report</h3>
+                <p class="price-desc">Perfect for a one-time need</p>
                 <div class="price">$49<span>/report</span></div>
+                <p class="price-note">One-time payment, no subscription</p>
                 <ul>
-                    <li>Any analysis type</li>
-                    <li>Full detailed report</li>
-                    <li>PDF export</li>
-                    <li>Delivered in 60 seconds</li>
+                    <li><span class="check">&#10003;</span> Any report type</li>
+                    <li><span class="check">&#10003;</span> 2,000-4,000+ word analysis</li>
+                    <li><span class="check">&#10003;</span> PDF export</li>
+                    <li><span class="check">&#10003;</span> 60-second delivery</li>
+                    <li><span class="check">&#10003;</span> Permanent access to report</li>
                 </ul>
-                <a href="/order" class="btn btn-primary" style="width: 100%;">Get Started</a>
+                <a href="/order" class="btn btn-primary" style="width: 100%;">Get Your Report</a>
             </div>
             <div class="pricing-card featured">
                 <h3>Professional</h3>
+                <p class="price-desc">For ongoing research needs</p>
                 <div class="price">$199<span>/month</span></div>
+                <p class="price-note">~$20/report &middot; Save 60%</p>
                 <ul>
-                    <li>10 reports / month</li>
-                    <li>All analysis types</li>
-                    <li>API access</li>
-                    <li>Priority generation</li>
-                    <li>Report history</li>
+                    <li><span class="check">&#10003;</span> 10 reports per month</li>
+                    <li><span class="check">&#10003;</span> All report types</li>
+                    <li><span class="check">&#10003;</span> API access</li>
+                    <li><span class="check">&#10003;</span> Priority generation</li>
+                    <li><span class="check">&#10003;</span> Report history dashboard</li>
                 </ul>
                 <a href="mailto:insightforge@azriel.io?subject=Professional%20Plan" class="btn btn-primary" style="width: 100%;">Contact Us</a>
             </div>
             <div class="pricing-card">
                 <h3>Enterprise</h3>
+                <p class="price-desc">Unlimited research at scale</p>
                 <div class="price">$499<span>/month</span></div>
+                <p class="price-note">Unlimited reports</p>
                 <ul>
-                    <li>Unlimited reports</li>
-                    <li>Custom analysis templates</li>
-                    <li>API access (high rate limit)</li>
-                    <li>Dedicated support</li>
-                    <li>White-label option</li>
+                    <li><span class="check">&#10003;</span> Unlimited reports</li>
+                    <li><span class="check">&#10003;</span> Custom report templates</li>
+                    <li><span class="check">&#10003;</span> High-rate API access</li>
+                    <li><span class="check">&#10003;</span> White-label option</li>
+                    <li><span class="check">&#10003;</span> Dedicated support</li>
                 </ul>
                 <a href="mailto:insightforge@azriel.io?subject=Enterprise%20Plan" class="btn btn-primary" style="width: 100%;">Contact Us</a>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <section class="waitlist-section" id="updates">
-        <h2>Stay Updated</h2>
-        <p class="subtitle">Get notified about new features, report types, and special offers.</p>
-        <form id="waitlist-form">
-            <div class="form-group">
-                <input type="email" id="email" name="email" placeholder="you@company.com" required>
+<!-- FAQ -->
+<section class="section" id="faq">
+    <div class="container text-center">
+        <span class="section-label">FAQ</span>
+        <h2 class="section-title">Common Questions</h2>
+
+        <div class="faq-list">
+            <div class="faq-item">
+                <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                    How is a 60-second report possible?
+                    <span class="faq-arrow">+</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        InsightForge is powered by Claude, one of the most advanced AI models available. It synthesizes knowledge from vast business, financial, and industry data to produce structured analysis in seconds. The result is comparable to what a junior analyst would produce in 2-3 days of research.
+                    </div>
+                </div>
             </div>
-            <button type="submit" class="btn btn-primary" style="width: 100%;" id="waitlist-btn">Subscribe</button>
-            <div id="waitlist-msg" style="display: none; margin-top: 12px; padding: 12px; border-radius: 8px;"></div>
-        </form>
-    </section>
-</div>
+            <div class="faq-item">
+                <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                    How accurate is the data in the reports?
+                    <span class="faq-arrow">+</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        Reports are based on the AI's training data, which covers publicly available business information, industry reports, financial data, and market research. Market size estimates and statistics are clearly marked as estimates where applicable. For critical business decisions, we recommend using our reports as a strong starting point and cross-referencing key figures with primary sources.
+                    </div>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                    What report types are available?
+                    <span class="faq-arrow">+</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        We offer four report types: <strong>Comprehensive Market Analysis</strong> (full market overview with SWOT, competitive landscape, and strategy), <strong>Competitive Intelligence</strong> (deep-dive on 5-10 competitors), <strong>SWOT Analysis</strong> (detailed strengths, weaknesses, opportunities, threats with cross-analysis), and <strong>Market Sizing</strong> (TAM/SAM/SOM with top-down and bottom-up estimates).
+                    </div>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                    Can I use the report in my pitch deck or business plan?
+                    <span class="faq-arrow">+</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        Absolutely. Once you purchase a report, it's yours to use however you like &mdash; in pitch decks, business plans, board presentations, academic papers, or internal strategy documents. You can export to PDF or copy the markdown source.
+                    </div>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                    What if I'm not satisfied with my report?
+                    <span class="faq-arrow">+</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        We stand behind the quality of our reports. If your report doesn't meet your expectations, email us at insightforge@azriel.io within 48 hours and we'll either regenerate it with adjusted parameters or issue a full refund. No questions asked.
+                    </div>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                    Is my payment information secure?
+                    <span class="faq-arrow">+</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        Yes. All payments are processed through Stripe, the same payment provider used by Amazon, Google, and Shopify. We never see or store your card details. Stripe is PCI-DSS Level 1 certified, the highest level of payment security certification.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Final CTA -->
+<section class="final-cta">
+    <div class="container" style="position: relative;">
+        <h2>Ready to Get Your Market Research?</h2>
+        <p>Stop spending weeks on research. Get the insights you need in 60 seconds.</p>
+        <a href="/order" class="btn btn-primary btn-lg">Get Your Report &mdash; $49</a>
+
+        <div class="waitlist-box">
+            <p style="color: var(--text-dim); font-size: 0.85rem; margin-bottom: 12px; margin-top: 32px;">Or subscribe for product updates:</p>
+            <form id="waitlist-form" class="waitlist-row">
+                <input type="email" id="email" placeholder="you@company.com" required>
+                <button type="submit" class="btn btn-primary" id="waitlist-btn">Subscribe</button>
+            </form>
+            <div id="waitlist-msg" style="display: none; margin-top: 10px; padding: 10px; border-radius: 8px; font-size: 0.85rem; text-align: center;"></div>
+        </div>
+    </div>
+</section>
+
 {% endblock %}
 
 {% block scripts %}
@@ -326,7 +836,7 @@ form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = document.getElementById('waitlist-btn');
     btn.disabled = true;
-    btn.textContent = 'Subscribing...';
+    btn.textContent = '...';
 
     try {
         const resp = await fetch('/api/v1/waitlist', {
@@ -339,7 +849,7 @@ form.addEventListener('submit', async (e) => {
         msg.style.background = '#064e3b';
         msg.style.color = '#6ee7b7';
         msg.textContent = data.message;
-        btn.textContent = "You're subscribed!";
+        btn.textContent = "Subscribed!";
     } catch (err) {
         msg.style.display = 'block';
         msg.style.background = '#7f1d1d';
